@@ -49,7 +49,7 @@ function startApp(port, options) {
     log = initializeFallbackLogger();
   }
 
-  const agentController = new Controller(log);
+  const sessionController = new Controller(log);
   
   const app = express();
 
@@ -58,7 +58,7 @@ function startApp(port, options) {
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
 
-  app.use('/data2mqtt', Router(agentController));
+  app.use('/starService', Router(sessionController));
 
   server = http.createServer(app);
 

@@ -3,19 +3,28 @@
 
 const express = require('express');
 
-module.exports = function Router(agentController) {
-  const agentRouter = express.Router();
+module.exports = function Router(sessionController) {
+  const sessionRouter = express.Router();
 
-  // get configuration data from data2mqtt
-  agentRouter.get('/', agentController.getAgents);
+  // get configuration data from starService
+  sessionRouter.get('/', sessionController.getSessions);
 
-  // create data2mqtt agent
-  agentRouter.post('/', agentController.createAgent);
+  // get constellations from starService
+  sessionRouter.get('/:session/con', sessionController.getConstellations);
 
-  // reconfigure data2mqtt agent
-  agentRouter.put('/:dataSource', agentController.reconfigureAgent);
+  // get session configuration data from starService
+  sessionRouter.get('/:session', sessionController.getSession);
 
-  // delete data2mqtt agent
-  agentRouter.delete('/:dataSource', agentController.deleteAgent);
-  return agentRouter;
+  // get star data from starService
+  sessionRouter.get('/:session/star', sessionController.getStar);
+  
+  // // create session
+  sessionRouter.post('/', sessionController.createSession);
+
+  // // reconfigure session
+  sessionRouter.put('/:session', sessionController.reconfigureSession);
+
+  // // delete session
+  sessionRouter.delete('/:session', sessionController.deleteSession);
+  return sessionRouter;
 };

@@ -1,0 +1,159 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <button onclick="clearScreen()">Clear Screen</button>
+    <button onclick="drawConstellations(constellations, 'lightgrey')">ALL</button>
+    <button onclick="constellationButton('lightgrey')">lightgrey</button>
+    <button onclick="constellationButton('green')">green</button>
+    <button onclick="constellationButton('red')">red</button>
+    <button onclick="constellationButton('blue')">blue</button>
+    <button onclick="constellationButton('orange')">orange</button>
+    <button onclick="constellationButton('violet')">violet</button>
+    <button onclick="drawConstellations(zodiac, 'red')">Zodiac in red</button>
+    <button onclick="changeMag(20)">Mag=20</button>
+    <button onclick="changeMag(6)">Mag=6</button>
+    <button onclick="changeMag(5)">Mag=5</button>
+    <button onclick="changeMag(4)">Mag=4</button>
+    <form>
+      <select id="conSelect" size="10">
+      </select>
+    </form>
+    <canvas id="starCanvas" width="1300" height="1300" style="border:2px solid #000000;">
+    </canvas>
+    <div id="responseSession">mein text</div>
+  </body>
+
+  <body>
+    <script>
+      var url = "http://localhost:3000/starService";
+      var sessionId = "";
+      var constellations = [];
+      var zodiac = ["Ari","Tau","Gem","Cnc","Leo","Vir","Lib","Sco","Sgr","Cap","Aqr","Psc"];
+      var canvasWidth = 1300;
+      getConstellations();
+      createSession();
+      
+      function fillSelector() {
+        var sel = document.getElementById("conSelect");
+        for( var i=0; i<constellations.length; i++ ){
+            var opt = document.createElement("OPTION");
+            opt.value = constellations[i];
+            opt.innerText = constellations[i];
+            sel.options.add(opt);
+        }
+      }
+
+      function sortCons( con ){
+        for( var i=0; i<con.length; i++ )
+          for( var j=i; j<con.length; j++ ){
+            if( con[i]>con[j] ){
+                var tmp = con[i];
+                con[i] = con[j];
+                con[j] = tmp;
+            }
+          }
+        return con;
+      }
+
+      function getConstellations(){
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", url+"/1/con", true);
+        xmlhttp.onreadystatechange = function() {
+          if(xmlhttp.readyState ===4 && xmlhttp.status ===200 || xmlhttp.status ===201 || xmlhttp.status ===204){
+            var con = JSON.parse(xmlhttp.responseText);
+            constellations = sortCons( con );
+            fillSelector();
+          }
+        };
+        xmlhttp.setRequestHeader("Content-Type","application/json");
+        xmlhttp.send();
+      }        
+
+      function createSession(){
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", url, true);
+        xmlhttp.onreadystatechange = function() {
+          if(xmlhttp.readyState ===4 && xmlhttp.status ===200 || xmlhttp.status ===201 || xmlhttp.status ===204){
+            var responseInfo = xmlhttp.responseText;
+            if( responseInfo != '' )
+              document.getElementById("responseSession").innerHTML = responseInfo;
+            sessionId = JSON.parse(responseInfo);
+          }
+        };
+        xmlhttp.setRequestHeader("Content-Type","application/json");
+        xmlhttp.send();
+      }
+      
+      function drawStars( stars, color ) {
+        var canvas = document.getElementById("starCanvas");
+        var ctx = canvas.getContext("2d");
+        var canvasHalf = canvasWidth/2;
+        ctx.fillStyle = color;
+        stars.forEach((v) => {
+          var x = v.x*canvasHalf + canvasHalf;
+          var y = v.y*canvasHalf + canvasHalf;
+          ctx.beginPath();
+          if( Number(v.mag) < 3 ){
+            ctx.arc(x,y,2,0,2*Math.PI);
+          }else{
+            ctx.arc(x,y,1,0,2*Math.PI);
+          }
+          ctx.fill();
+        });
+      }
+
+      function drawConstellation( con, color ){
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", url+"/"+sessionId+"/star?constellation="+con, true);
+        xmlhttp.onreadystatechange = function() {
+          if(xmlhttp.readyState ===4 && xmlhttp.status ===200 || xmlhttp.status ===201 || xmlhttp.status ===204){
+            var responseInfo = xmlhttp.responseText;
+            if( responseInfo != '' )
+              var sel = document.getElementById("conSelect");
+              document.getElementById("responseSession").innerHTML = sel.value;
+            drawStars( JSON.parse(responseInfo), color );
+          }
+        };
+        xmlhttp.setRequestHeader("Content-Type","application/json");
+        xmlhttp.send();
+      }
+      
+      function drawConstellations( cons, color ){
+        for( var i=0; i<cons.length; i++ ){
+            drawConstellation( cons[i], color );
+        }
+      }
+
+      function constellationButton( color ){
+        var sel = document.getElementById("conSelect");
+        drawConstellation( sel.value, color );
+      }
+
+      function changeMag( newMag ){
+        var body = {minMag:newMag, maxResult:10000};
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("PUT", url+"/"+sessionId, true);
+        xmlhttp.onreadystatechange = function() {
+          if(xmlhttp.readyState ===4 && xmlhttp.status ===200 || xmlhttp.status ===201 || xmlhttp.status ===204){
+            var responseInfo = xmlhttp.responseText;
+            if( responseInfo != '' )
+              document.getElementById("responseSession").innerHTML = responseInfo;
+          }
+        };
+        xmlhttp.setRequestHeader("Content-Type","application/json");
+        xmlhttp.send(JSON.stringify( body ));
+      }
+      
+      function clearScreen(){
+        var canvas = document.getElementById("starCanvas");
+        var ctx = canvas.getContext("2d");
+        var canvasHalf = canvasWidth/2;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0,0,canvasWidth,canvasWidth);
+        ctx.fill();
+      }
+    </script>
+  </body>  
+</html>
