@@ -10,7 +10,7 @@ module.exports = function Router(sessionController) {
   sessionRouter.get('/', sessionController.getSessions);
 
   // get constellations from starService
-  sessionRouter.get('/:session/con', sessionController.getConstellations);
+  sessionRouter.get('/:session/constellations', sessionController.getConstellations);
 
   // get session configuration data from starService
   sessionRouter.get('/:session', sessionController.getSession);
@@ -18,13 +18,16 @@ module.exports = function Router(sessionController) {
   // get star data from starService
   sessionRouter.get('/:session/star', sessionController.getStar);
   
-  // // create session
+  // find star data from starService
+  sessionRouter.get('/:session/find', sessionController.findStar);
+  
+  // create session
   sessionRouter.post('/', sessionController.createSession);
 
-  // // reconfigure session
+  // reconfigure session
   sessionRouter.put('/:session', sessionController.reconfigureSession);
 
-  // // delete session
+  // delete session
   sessionRouter.delete('/:session', sessionController.deleteSession);
   return sessionRouter;
 };

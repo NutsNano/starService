@@ -29,7 +29,7 @@ module.exports = class Controller {
     var xRes = x * factor;
     var yRes = y * factor;
     var result = {
-      x: xRes,
+      x: -xRes,
       y: yRes,
       mag: Number(star[13])
     };
@@ -43,8 +43,34 @@ module.exports = class Controller {
     tmp.owner = (config.owner==undefined ? "johnDoe" : config.owner);
     tmp.maxResult = (config.maxResult==undefined ? 200 : config.maxResult);
     tmp.minMag = (config.minMag==undefined ? 5 : config.minMag);
+    tmp.starCoords = [];
+    var nos = this.star.length;
+    for( var i=0; i<nos; i++ ){
+      var coords = this.calcCoordinates( this.star[i] );
+      var starTmp = [coords.x, coords.y, Number( this.star[i][13] )];
+      tmp.starCoords.push( starTmp );
+    }
     this.session.push( tmp );
+    console.log("New session: "+tmp.UUID);
     return tmp.UUID;
+  }
+
+  findStarByCoordinates( starCoords, x, y, mag ){
+    var candidate = {
+      index: -1,
+      dist: 10
+    }
+    var nos = starCoords.length;
+    for( var i=0; i<nos; i++ ){
+      if( starCoords[i][2] <= mag ){
+        var dist = Math.abs( x-starCoords[i][0] ) + Math.abs(y-starCoords[i][1] );
+        if( dist<candidate.dist ){
+          candidate.dist = dist;
+          candidate.index = i; 
+        } 
+      }
+    }
+    return candidate.index;
   }
 
   constructor(log) {
@@ -124,7 +150,7 @@ module.exports = class Controller {
       }
       if (req.body.UUID !== undefined && 
           this.session.findIndex((v) => (v.UUID === req.body.UUID)) !== -1 ) {
-        res.status(400).send(JSON.stringify('session is already existing'));
+        res.status(200).send(JSON.stringify(req.body.UUID));
         return;
       }
       const uuid = this.addSession(req.body);
@@ -156,6 +182,47 @@ module.exports = class Controller {
           result.push( tmp );
         }
       });
+      res.set({ "Access-Control-Allow-Origin": "*" });
+      res.set({ 'Content-Type': 'application/json' });
+      res.status(200).send(JSON.stringify(result));
+    }
+
+    // find star data from starService
+    findStar = async (req, res) => {
+      // console.log("here: find Star");
+      res.set({ "Access-Control-Allow-Origin": "*" });
+      res.set({ 'Content-Type': 'application/json' });
+      const index = this.session.findIndex((v) => (v.UUID === req.params.session));
+      if (index === -1) {
+        res.set({ 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.status(400).send(JSON.stringify('session not found'));
+        // console.log("no valid session");
+        return;
+      }
+      if (req.query.x == undefined || req.query.y == undefined) {
+        res.set({ 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.status(400).send(JSON.stringify('no coordinates provided'));
+        // console.log("no x or y coordinates");
+        return;
+      }
+      var starIndex = this.findStarByCoordinates(
+        this.session[index].starCoords,
+        req.query.x,
+        req.query.y,
+        this.session[index].minMag );
+      var result = { index: -1, bf: "", proper: "", mag: 0, con: "",x: 0, y: 0, z: 0 };
+      if( starIndex != -1 ){
+        result = {
+          index: starIndex,
+          bf: this.star[starIndex][5],
+          proper: this.star[starIndex][6],
+          mag: Number( this.star[starIndex][13] ),
+          con: this.star[starIndex][29],
+          x: Number( this.star[starIndex][17]),
+          y: Number( this.star[starIndex][18]),
+          z: Number( this.star[starIndex][19])
+        }
+      }  
       res.set({ "Access-Control-Allow-Origin": "*" });
       res.set({ 'Content-Type': 'application/json' });
       res.status(200).send(JSON.stringify(result));
