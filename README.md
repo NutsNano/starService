@@ -12,3 +12,4 @@ services are
   PUT /sessionId -> change session parameters
   DELETE /sessionId -> delete session
   
+run with: npm start
