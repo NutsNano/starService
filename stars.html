@@ -1,30 +1,46 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <link href="style.css" rel="stylesheet">
   </head>
   <body>
-    <button onclick="clearScreen()">Clear Screen</button>
-    <button onclick="setColor(constellations,readColor());drawConstellations(constellations)">DRAW ALL</button>
-    <button onclick="constellationButton(readColor())">DRAW CONSTELLATION</button>
-    <button onclick="setColor(consZodiac,readColor());drawConstellations(consZodiac)">DRAW ZODIAC</button>
-    <button onclick="changeMag(20)">Mag=20</button>
-    <button onclick="changeMag(8)">Mag=8</button>
-    <button onclick="changeMag(6)">Mag=6</button>
-    <button onclick="changeMag(5)">Mag=5</button>
-    <button onclick="changeMag(4)">Mag=4</button>
+    <button style="background-color: white;color: black; font-size: medium;"
+      onclick="clearScreen()">Clear Screen</button>
+    <button style="background-color: lightgreen;color: black; font-size: medium;"
+      onclick="setColor(constellations,readColor());drawConstellations(constellations)">DRAW ALL</button>
+    <button style="background-color: darkblue;color: white; font-size: medium;"
+      onclick="constellationButton(readColor())">DRAW CONSTELLATION</button>
+    <button style="background-color: darkgreen;color: white; font-size: medium;"
+      onclick="setColor(consZodiac,readColor());drawConstellations(consZodiac)">DRAW ZODIAC</button>
     <form>
-      <select id="conSelect" size="10">
+      <select id="magSelect" size="5" style="background-color: darkred;color: white; font-size: medium;"
+        onclick="processMag()">
+        <option value="4">Mag  4</option>
+        <option value="5">Mag  5</option>
+        <option value="6">Mag  6</option>
+        <option value="8">Mag  8</option>
+        <option value="20">Mag 20</option>
       </select>
-      <input type="radio" id="red" name="color" value="red"><label for="red">RED</label>
-      <input type="radio" id="green" name="color" value="green"><label for="green">GREEN</label>
-      <input type="radio" id="blue" name="color" value="blue"><label for="blue">BLUE</label>
-      <input type="radio" id="orange" name="color" value="orange"><label for="orange">ORANGE</label>
-      <input type="radio" id="violet" name="color" value="violet"><label for="violet">VIOLET</label>
-      <input type="radio" id="lightgrey" name="color" value="lightgrey"><label for="lightgrey">LIGHTGREY</label>
+      
+      <select id="conSelect" size="5" style="background-color: darkblue;color: white; font-size: medium;">
+      </select>
+      <input type="radio" id="red" name="color" value="red">
+        <label for="red" style="color: red">RED</label>
+      <input type="radio" id="green" name="color" value="green">
+        <label for="green" style="color: green">GREEN</label>
+      <input type="radio" id="blue" name="color" value="blue">
+        <label for="blue" style="color: blue">BLUE</label>
+      <input type="radio" id="orange" name="color" value="orange">
+        <label for="orange" style="color: orange">ORANGE</label>
+      <input type="radio" id="violet" name="color" value="violet">
+        <label for="violet" style="color: violet">VIOLET</label>
+      <input type="radio" id="lightgrey" name="color" value="lightgrey">
+        <label for="lightgrey" style="color: darkgrey">LIGHTGREY</label>
     </form>
-    <button onclick="test()">radio-Test</button>
     
-    <canvas id="starCanvas" width="1000" height="1000" style="border:2px solid #000000;" onclick="callbackCanvas(event.offsetX,event.offsetY)">
+    <canvas id="starCanvas" width="1000" height="1000"
+        style="border:2px solid #000000; background-color: #FFFFFF;"
+        onclick="callbackCanvas(event.offsetX,event.offsetY)">
     </canvas>
     <div id="responseSession">mein text</div>
   </body>
@@ -48,17 +64,6 @@
       getConstellations();
       createSession();
       
-      function test(){
-        var color = "";
-        if( document.getElementById("red").checked ) color="red";
-        if( document.getElementById("green").checked ) color="green";
-        if( document.getElementById("blue").checked ) color="blue";
-        if( document.getElementById("orange").checked ) color="orange";
-        
-        document.getElementById("responseSession").innerHTML = color;
-      }
-
-
       // fill the selector widget with the constellations
       function fillSelector( cons ) {
         var sel = document.getElementById("conSelect");
@@ -219,6 +224,12 @@
         xmlhttp.send(JSON.stringify( body ));
       }
       
+      // read mag from selection and set it using changeMag
+      function processMag(){
+        var sel = document.getElementById("magSelect");
+        changeMag( sel.value );
+      }
+
       function readColor(){
         var color = "yellow";
         if( document.getElementById("red").checked ) color="red";

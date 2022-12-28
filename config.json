@@ -1,0 +1,241 @@
+[
+  {
+    "dataSource":"operatingHours",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"opHours",
+    "cycleTimeInMs":3000,
+    "data":[
+      {
+        "label":"Op Hours",
+        "value":"2156",
+        "unit":"h",
+        "category":"Custom"
+      }
+    ],
+    "index":0,
+    "mode":"still"
+  },
+  {
+    "dataSource":"airPressure",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"airPressure",
+    "cycleTimeInMs":1000,
+    "data":[
+      {
+        "label":"Air Pressure",
+        "value":"5.8",
+        "unit":"bar",
+        "category":"Pressure"
+      },
+      {
+        "label":"Air Pressure",
+        "value":"5.4",
+        "unit":"bar",
+        "category":"Pressure"
+      },
+      {
+        "label":"Air Pressure",
+        "value":"5.6",
+        "unit":"bar",
+        "category":"Pressure"
+      }
+    ],
+    "index":0,
+    "mode":"forward"
+  },
+  {
+    "dataSource":"lastErrorCodes",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"lastErrCodes",
+    "cycleTimeInMs":1000,
+    "data":[
+      {
+        "label":"Last Errors",
+        "value":" * E034",
+        "unit":"",
+        "category":"Custom",
+        "icon":"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP88flHPQAJMgNktDmvegAAAABJRU5ErkJggg=="
+      },
+      {
+        "label":"Last Errors",
+        "value":"1< E194",
+        "unit":"",
+        "category":"Custom",
+        "icon":"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP88flHPQAJMgNktDmvegAAAABJRU5ErkJggg=="
+      },
+      {
+        "label":"Last Errors",
+        "value":"2< E554",
+        "unit":"",
+        "category":"Custom",
+        "icon":"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP88flHPQAJMgNktDmvegAAAABJRU5ErkJggg=="
+      },
+      {
+        "label":"Last Errors",
+        "value":"3< E556",
+        "unit":"",
+        "category":"Custom",
+        "icon":"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP88flHPQAJMgNktDmvegAAAABJRU5ErkJggg=="
+      }
+    ],
+    "index":0,
+    "mode":"forward"
+  },
+  {
+    "dataSource":"glueLevel",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"glueLevel",
+    "cycleTimeInMs":3000,
+    "data":[
+      {
+        "label":"Glue Level",
+        "value":"78",
+        "unit":"%",
+        "category":"Custom"
+      }
+    ],
+    "index":0,
+    "mode":"still"
+  },
+  {
+    "dataSource":"activeAdaptor",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"actAdaptor",
+    "cycleTimeInMs":3000,
+    "data":[
+      {
+        "label":"Adaptor",
+        "value":"PCB 22/S",
+        "unit":"",
+        "category":"Custom",
+        "icon":"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP88flHPQAJMgNktDmvegAAAABJRU5ErkJggg=="
+      }
+    ],
+    "index":0,
+    "mode":"still"
+  },
+  {
+    "dataSource":"glueTemperature",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"glueTemp",
+    "cycleTimeInMs":2000,
+    "data":[
+      {
+        "label":"Glue Temp",
+        "value":"140",
+        "unit":"°",
+        "category":"Temp"
+      },
+      {
+        "label":"Glue Temp",
+        "value":"143",
+        "unit":"°",
+        "category":"Temp"
+      },
+      {
+        "label":"Glue Temp",
+        "value":"139",
+        "unit":"°",
+        "category":"Temperature"
+      },
+      {
+        "label":"Glue Temp",
+        "value":"137",
+        "unit":"°",
+        "category":"Temperature"
+      }
+    ],
+    "index":0,
+    "mode":"forward"
+  },
+  {
+    "dataSource":"piecesProduced",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"piecesProd",
+    "cycleTimeInMs":5000,
+    "data":[
+      {
+        "label":"Pieces Produced",
+        "value":"125",
+        "unit":"",
+        "category":"Count"
+      },
+      {
+        "label":"Pieces Produced",
+        "value":"126",
+        "unit":"",
+        "category":"Count"
+      },
+      {
+        "label":"Pieces Produced",
+        "value":"127",
+        "unit":"",
+        "category":"Count"
+      },
+      {
+        "label":"Pieces Produced",
+        "value":"128",
+        "unit":"",
+        "category":"Count"
+      },
+      {
+        "label":"Pieces Produced",
+        "value":"129",
+        "unit":"",
+        "category":"Count"
+      }
+    ],
+    "index":0,
+    "mode":"forward"
+  },
+  {
+    "dataSource":"yield",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"yield",
+    "cycleTimeInMs":5000,
+    "data":[
+      {
+        "label":"Yield",
+        "value":"96.5",
+        "unit":"%",
+        "category":"Custom"
+      },
+      {
+        "label":"Yield",
+        "value":"96.7",
+        "unit":"%",
+        "category":"Custom"
+      },
+      {
+        "label":"Yield",
+        "value":"96.4",
+        "unit":"%",
+        "category":"Custom"
+      }
+    ],
+    "index":0,
+    "mode":"forward"
+  },
+  {
+    "dataSource":"orderNumber",
+    "broker":"mqtt://192.168.1.1",
+    "topic":"orderNo",
+    "cycleTimeInMs":5000,
+    "data":[
+      {
+        "label":"Order Number",
+        "value":"22-07-97A",
+        "unit":"",
+        "category":"Custom"
+      },
+      {
+        "label":"Order Number",
+        "value":"22-07-99E",
+        "unit":"",
+        "category":"Custom"
+      }
+    ],
+    "index":0,
+    "mode":"forward"
+  }
+]
