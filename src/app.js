@@ -36,7 +36,7 @@ function initializeFallbackLogger() {
 }
 
 /**
- * Starting data2mqtt service for cyclic publishing of JSON data sources
+ * Starting starService
  * @param {*} port Port of service
  * @param {*} options Options, e.g. for adding custom logger.
  * Logger must implement functions 'info' & 'error'. Example: options: { logger: myCustomLogger }.
@@ -63,12 +63,12 @@ function startApp(port, options) {
   server = http.createServer(app);
 
   server.listen(port || 3000, () => {
-    log.info(`data2mqtt Service started on port ${server.address().port}`);
+    log.info(`starService started on port ${server.address().port}`);
   });
 }
 
 /**
- * Stopping data2mqtt service.
+ * Stopping starService.
  * @param {*} options Options, e.g. for adding custom logger.
  * Logger must implement functions 'info' & 'error'. Example: options: { logger: myCustomLogger }.
  * If logger is not set, default winston logger to console is used.
