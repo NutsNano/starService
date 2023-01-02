@@ -2,6 +2,7 @@
   <head>
     <meta charset="UTF-8">
     <link href="style.css" rel="stylesheet">
+    <title>starService Frontend</title>
   </head>
   <body>
     <button style="background-color: white;color: black; font-size: medium;"
@@ -12,6 +13,8 @@
       onclick="constellationButton(readColor())">DRAW CONSTELLATION</button>
     <button style="background-color: darkgreen;color: white; font-size: medium;"
       onclick="setColor(consZodiac,readColor());drawConstellations(consZodiac)">DRAW ZODIAC</button>
+    <button id="zoomout" disabled="true" style="background-color: lightgrey;color: grey; font-size: medium;"
+      onclick="zoomOut()">ZOOM OUT</button>
     <form>
       <select id="magSelect" size="5" style="background-color: darkred;color: white; font-size: medium;"
         onclick="processMag()">
@@ -24,6 +27,8 @@
       
       <select id="conSelect" size="5" style="background-color: darkblue;color: white; font-size: medium;">
       </select>
+      <input type="checkbox" id="type"  value="primary">
+        <label for="type" style="color: black">PRIMARY ONLY</label>
       <input type="radio" id="red" name="color" value="red">
         <label for="red" style="color: red">RED</label>
       <input type="radio" id="green" name="color" value="green">
@@ -40,7 +45,9 @@
     
     <canvas id="starCanvas" width="1000" height="1000"
         style="border:2px solid #000000; background-color: #FFFFFF;"
-        onclick="callbackCanvas(event.offsetX,event.offsetY)">
+        onclick="callbackCanvas(event.offsetX,event.offsetY,event.altKey)"
+        onmousedown="callbackCanvasDown(event.offsetX,event.offsetY,event.altKey)"
+        onmouseup="callbackCanvasUp(event.offsetX,event.offsetY,event.altKey)">
     </canvas>
     <div id="responseSession">mein text</div>
   </body>
@@ -60,10 +67,31 @@
       var consZodiac = [];
       for( var i=0; i<zodiac.length; i++ )
         consZodiac.push( {name: zodiac[i], color: "white", lastColor: "empty"} );
-      var canvasWidth = 1000;
+      vpStack = [];
+      var vp = {
+        viewport: {x:1000,y:1000},
+        scale: 1,
+        center: {x:0,y:0},
+        domain: {x:2,y:2},
+        dmin: {x:-1,y:-1},
+        dmax: {x:1,y:1},
+        ddiff: {x:2,y:2}
+      };
+      var zstart = {x:-1,y:1};
+      var zend = {x:1,y:-1};
+     
       getConstellations();
       createSession();
       
+      function vport( d ){
+        return { x:(d.x-vp.dmin.x)*vp.viewport.x/vp.ddiff.x, y:vp.viewport.y - ((d.y-vp.dmin.y)*vp.viewport.y/vp.ddiff.y) };
+      }
+
+      function dom( v ){
+        return { x:(v.x*vp.ddiff.x/vp.viewport.x)+vp.dmin.x, y:((v.y-vp.viewport.y)*vp.ddiff.y/(-vp.viewport.y))+vp.dmin.y };
+      }
+
+
       // fill the selector widget with the constellations
       function fillSelector( cons ) {
         var sel = document.getElementById("conSelect");
@@ -153,22 +181,21 @@
       function drawStars( stars, color ) {
         var canvas = document.getElementById("starCanvas");
         var ctx = canvas.getContext("2d");
-        var canvasHalf = canvasWidth/2;
+        // var canvasHalf = canvasWidth/2;
         ctx.fillStyle = color;
         stars.forEach((v) => {
-          var x = v.x*canvasHalf + canvasHalf;
-          var y = v.y*(-canvasHalf) + canvasHalf;
+          var vprt = vport( {x:v.x,y:v.y} );
           ctx.beginPath();
           if( Number(v.mag) < 3 ){
             if( color == "white" )
-              ctx.arc(x,y,3,0,2*Math.PI);
+              ctx.arc(vprt.x,vprt.y,3,0,2*Math.PI);
             else
-              ctx.arc(x,y,2,0,2*Math.PI);
+              ctx.arc(vprt.x,vprt.y,2,0,2*Math.PI);
           }else{
             if( color == "white" )
-              ctx.arc(x,y,2,0,2*Math.PI);
+              ctx.arc(vprt.x,vprt.y,2,0,2*Math.PI);
             else
-              ctx.arc(x,y,1,0,2*Math.PI);
+              ctx.arc(vprt.x,vprt.y,1,0,2*Math.PI);
           }
           ctx.fill();
         });
@@ -177,7 +204,11 @@
       // get stars of conName from starService and draw them
       function drawConstellation( conName, color ){
         var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("GET", url+"/"+sessionId+"/star?constellation="+conName, true);
+        var uri = url+"/"+sessionId+"/star?constellation="+conName;
+        var primaryChecked = document.getElementById("type").checked;
+        if( primaryChecked )
+          uri = uri + "&type=primary";
+        xmlhttp.open("GET", uri, true);
         xmlhttp.onreadystatechange = function() {
           if(xmlhttp.readyState ===4 && xmlhttp.status ===200 || xmlhttp.status ===201 || xmlhttp.status ===204){
             var responseInfo = xmlhttp.responseText;
@@ -197,6 +228,15 @@
           if( index !== -1 ){
             //drawConstellation( constellations[index].name, "white" );
             drawConstellation( constellations[index].name, constellations[index].color );
+          }
+        });
+      }
+
+      // draw all constellations with a valid color
+      function drawActiveConstellations(){
+        constellations.forEach( (e) => {
+          if( e.color !== "white" ){
+            drawConstellation( e.name, e.color );
           }
         });
       }
@@ -241,13 +281,11 @@
         return color;
       }
 
-      function callbackCanvas( xCanvas, yCanvas ) {
-        var canvasHalf = canvasWidth/2;
-        var x = (xCanvas-canvasHalf)/canvasHalf;
-        var y = (yCanvas-canvasHalf)/(-canvasHalf);
-        var uri = url+"/"+sessionId+"/find?x="+String(x)+"&y="+String(y);
-        document.getElementById("responseSession").innerHTML = "x="+String(x)+" y="+String(y)
-        
+      function callbackCanvas( xCanvas, yCanvas, alt ) {
+        if( alt ) return;
+        var tmp = dom( {x:xCanvas, y:yCanvas});
+        var uri = url+"/"+sessionId+"/find?x="+String(tmp.x)+"&y="+String(tmp.y);
+ 
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("GET", uri, true);
         xmlhttp.onreadystatechange = function() {
@@ -264,13 +302,86 @@
         xmlhttp.send();
       }
 
+      function callbackCanvasDown( xCanvas, yCanvas, alt ) {
+        if( !alt ) return;
+        zstart = dom( {x:xCanvas, y:yCanvas} );
+        // var canvasHalf = canvasWidth/2;
+        // var x = (xCanvas-canvasHalf)/canvasHalf;
+        // var y = (yCanvas-canvasHalf)/(-canvasHalf);
+        document.getElementById("responseSession").innerHTML = "DOWN x="+String(Math.floor(1000*zstart.x)/1000)+" y="+String(Math.floor(1000*zstart.y)/1000);
+      }
+
+      function callbackCanvasUp( xCanvas, yCanvas, alt ) {
+        if( !alt ) return;
+        zend = dom( {x:xCanvas, y:yCanvas} );
+        document.getElementById("responseSession").innerHTML = "UP x="+String(Math.floor(1000*zend.x)/1000)+" y="+String(Math.floor(1000*zend.y)/1000);
+        if( zstart.x === zend.x || zstart.y === zend.y ) return;
+        
+        var zminx = ( zstart.x < zend.x ? zstart.x : zend.x );
+        var zminy = ( zstart.y < zend.y ? zstart.y : zend.y );
+        var zmaxx = ( zstart.x > zend.x ? zstart.x : zend.x );
+        var zmaxy = ( zstart.y > zend.y ? zstart.y : zend.y );
+        var zdiffx = zmaxx-zminx;
+        var zdiffy = zmaxy-zminy;
+        var centerNew = {x:(zend.x+zstart.x)/2, y:(zend.y+zstart.y)/2};
+        var scaleNew = ( zdiffx >= zdiffy ? vp.domain.x/zdiffx : vp.domain.y/zdiffy );
+        var dminNew = {x:centerNew.x-(vp.domain.x/(2*scaleNew)), y:centerNew.y-(vp.domain.y/(2*scaleNew))}; 
+        var dmaxNew = {x:centerNew.x+(vp.domain.x/(2*scaleNew)), y:centerNew.y+(vp.domain.y/(2*scaleNew))};
+        var ddiffNew = {x:dmaxNew.x-dminNew.x, y: dmaxNew.y-dminNew.y};
+        vpStack.push( vp );
+        document.getElementById("zoomout").disabled = false;
+        document.getElementById("zoomout").style.color = "white";
+        document.getElementById("zoomout").style.backgroundColor = "darkviolet";
+        vp = {};
+        vp = {
+          viewport: {x:1000,y:1000},
+          domain: {x:2,y:2},
+          center: centerNew,
+          scale: scaleNew,
+          dmin: dminNew,
+          dmax: dmaxNew,
+          ddiff: ddiffNew
+        };
+        console.log( vp );
+        zstart = {x:-1,y:1};
+        zend = {x:1,y:-1};
+        
+        var canvas = document.getElementById("starCanvas");
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0,0,vp.viewport.x,vp.viewport.y);
+        ctx.fill();
+
+        drawActiveConstellations();
+      }
+
+      // set zoom to half the former value
+      function zoomOut(){
+        if( vpStack.length === 0 )
+          return;
+        vp = vpStack.pop();
+        if( vpStack.length === 0 ){
+          document.getElementById("zoomout").disabled = true;
+          document.getElementById("zoomout").style.color = "grey";
+          document.getElementById("zoomout").style.backgroundColor = "lightgrey";
+        }
+        var canvas = document.getElementById("starCanvas");
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0,0,vp.viewport.x,vp.viewport.y);
+        ctx.fill();
+
+        drawActiveConstellations();
+        
+      }
+
       // clear canvas screen
       function clearScreen(){
         var canvas = document.getElementById("starCanvas");
         var ctx = canvas.getContext("2d");
-        var canvasHalf = canvasWidth/2;
+        // var canvasHalf = canvasWidth/2;
         ctx.fillStyle = 'white';
-        ctx.fillRect(0,0,canvasWidth,canvasWidth);
+        ctx.fillRect(0,0,vp.viewport.x,vp.viewport.y);
         ctx.fill();
         constellations.forEach( (v) => {
             v.color = "white";

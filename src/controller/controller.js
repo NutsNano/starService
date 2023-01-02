@@ -172,14 +172,19 @@ module.exports = class Controller {
         res.status(400).send(JSON.stringify('no constellation provided'));
         return;
       }
+      var all = true;
+      if( req.query.type !== undefined && req.query.type === "primary" )
+        all = false;
       var starCounter = this.session[index].maxResult;
       var minMag = this.session[index].minMag;
       const result = [];
       this.star.forEach((v) => {
         if (starCounter>0 && v[29]==req.query.constellation && Number(v[13])<minMag){
-          var tmp = this.calcCoordinates( v );
-          starCounter--;
-          result.push( tmp );
+          if( all || v[27] !== "" ){
+            var tmp = this.calcCoordinates( v );
+            starCounter--;
+            result.push( tmp );
+          }
         }
       });
       res.set({ "Access-Control-Allow-Origin": "*" });
@@ -218,6 +223,7 @@ module.exports = class Controller {
           proper: this.star[starIndex][6],
           mag: Number( this.star[starIndex][13] ),
           con: this.star[starIndex][29],
+          beyer: this.star[starIndex][27],
           x: Number( this.star[starIndex][17]),
           y: Number( this.star[starIndex][18]),
           z: Number( this.star[starIndex][19])

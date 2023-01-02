@@ -2,4 +2,12 @@ body {
     background-color: lightblue;
     color: black;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    border-style:inset;
+    border-radius: 6mm;
+}
+
+button {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    border-style:groove;
+    border-radius: 2mm;
 }
