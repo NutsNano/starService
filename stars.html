@@ -3,55 +3,74 @@
     <meta charset="UTF-8">
     <link href="style.css" rel="stylesheet">
     <title>starService Frontend</title>
+    <style>
+      .item1 {grid-area:buttons;}
+      .item2 {grid-area:constellations;}
+      .item3 {grid-area:canvas;}
+      .item4 {grid-area:info}
+      .grid-container {
+        display: grid;
+        grid-template-areas:
+          'buttons buttons buttons buttons buttons'
+          'constellations canvas canvas canvas canvas'
+          'info info info info info';
+        gap:10px;
+        background-color: lightgrey;
+        padding:10px;
+        border-radius:24px;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+      }
+      .grid-container > div {
+        background-color: rgb(190, 190, 190);
+      }
+    </style>
   </head>
   <body>
-    <button style="background-color: white;color: black; font-size: medium;"
-      onclick="clearScreen()">Clear Screen</button>
-    <button style="background-color: lightgreen;color: black; font-size: medium;"
-      onclick="setColor(constellations,readColor());drawConstellations(constellations)">DRAW ALL</button>
-    <button style="background-color: darkblue;color: white; font-size: medium;"
-      onclick="constellationButton(readColor())">DRAW CONSTELLATION</button>
-    <button style="background-color: darkgreen;color: white; font-size: medium;"
-      onclick="setColor(consZodiac,readColor());drawConstellations(consZodiac)">DRAW ZODIAC</button>
-    <button id="zoomout" disabled="true" style="background-color: lightgrey;color: grey; font-size: medium;"
-      onclick="zoomOut()">ZOOM OUT</button>
-    <form>
-      <select id="magSelect" size="5" style="background-color: darkred;color: white; font-size: medium;"
-        onclick="processMag()">
-        <option value="4">Mag  4</option>
-        <option value="5">Mag  5</option>
-        <option value="6">Mag  6</option>
-        <option value="8">Mag  8</option>
-        <option value="20">Mag 20</option>
-      </select>
-      
-      <select id="conSelect" size="5" style="background-color: darkblue;color: white; font-size: medium;">
-      </select>
-      <input type="checkbox" id="type"  value="primary">
-        <label for="type" style="color: black">PRIMARY ONLY</label>
-      <input type="radio" id="red" name="color" value="red">
-        <label for="red" style="color: red">RED</label>
-      <input type="radio" id="green" name="color" value="green">
-        <label for="green" style="color: green">GREEN</label>
-      <input type="radio" id="blue" name="color" value="blue">
-        <label for="blue" style="color: blue">BLUE</label>
-      <input type="radio" id="orange" name="color" value="orange">
-        <label for="orange" style="color: orange">ORANGE</label>
-      <input type="radio" id="violet" name="color" value="violet">
-        <label for="violet" style="color: violet">VIOLET</label>
-      <input type="radio" id="lightgrey" name="color" value="lightgrey">
-        <label for="lightgrey" style="color: darkgrey">LIGHTGREY</label>
-    </form>
-    
-    <canvas id="starCanvas" width="1000" height="1000"
-        style="border:2px solid #000000; background-color: #FFFFFF;"
-        onclick="callbackCanvas(event.offsetX,event.offsetY,event.altKey)"
-        onmousedown="callbackCanvasDown(event.offsetX,event.offsetY,event.altKey)"
-        onmouseup="callbackCanvasUp(event.offsetX,event.offsetY,event.altKey)">
-    </canvas>
-    <div id="responseSession">mein text</div>
+    <div class="grid-container">
+      <div class="item1">
+        <form>
+          <label for="mag" id="magvalue">Magnitude (05): </label>
+          <input type="range" id="mag" min="3" max="21" value="5" onchange="showMagValue(value)" oninput="setMagValue(value)">
+          <input type="checkbox" id="type"  value="primary">
+            <label for="type" style="color: black; font-size: medium;">PRIMARY ONLY</label>
+          <input type="radio" id="red" name="color" value="red">
+            <label for="red" style="color: red; font-size: medium;">RED</label>
+          <input type="radio" id="green" name="color" value="green">
+            <label for="green" style="color: green; font-size: medium;">GREEN</label>
+          <input type="radio" id="blue" name="color" value="blue">
+            <label for="blue" style="color: blue; font-size: medium;">BLUE</label>
+          <input type="radio" id="orange" name="color" value="orange">
+            <label for="orange" style="color: orange; font-size: medium;">ORANGE</label>
+          <input type="radio" id="violet" name="color" value="violet">
+            <label for="violet" style="color: violet; font-size: medium;">VIOLET</label>
+          <input type="radio" id="lightgrey" name="color" value="lightgrey">
+            <label for="lightgrey" style="color: darkgrey; font-size: medium;">LIGHTGREY</label>
+        </form>
+      </div>
+      <div class="item2">      
+        <button style="background-color: white;color: black; font-size: medium;"
+          onclick="clearScreen()">Clear Screen</button><br>
+        <button style="background-color: lightgreen;color: black; font-size: medium;"
+          onclick="setColor(constellations,readColor());drawConstellations(constellations)">DRAW ALL</button><br>
+        <select id="conSelect" size="25" style="background-color: darkblue;color: white; font-size: medium;">
+        </select><br>
+        <button style="background-color: darkblue;color: white; font-size: medium;"
+          onclick="constellationButton(readColor())">DRAW CONSTELLATION</button><br>
+        <button style="background-color: darkgreen;color: white; font-size: medium;"
+          onclick="setColor(consZodiac,readColor());drawConstellations(consZodiac)">DRAW ZODIAC</button><br><br><br><br>
+        <button id="zoomout" disabled="true" style="height: 60px; background-color: lightgrey; color: grey; font-size: medium;" onclick="zoomOut()">ZOOM OUT</button>
+      </div>
+      <div class="item3">    
+        <canvas id="starCanvas" width="1000" height="1000"
+            style="border:2px solid #000000; background-color: #FFFFFF;"
+            onclick="callbackCanvas(event.offsetX,event.offsetY,event.altKey)"
+            onmousedown="callbackCanvasDown(event.offsetX,event.offsetY,event.altKey)"
+            onmouseup="callbackCanvasUp(event.offsetX,event.offsetY,event.altKey)">
+        </canvas>
+      </div>
+      <div class="item4" id="responseSession">mein text</div>
   </body>
-
+  </div>
   <body>
     <script>
       var url = "http://localhost:3000/starService";
@@ -83,14 +102,15 @@
       getConstellations();
       createSession();
       
+      // transform viewport coordinates into domain coordinates
       function vport( d ){
         return { x:(d.x-vp.dmin.x)*vp.viewport.x/vp.ddiff.x, y:vp.viewport.y - ((d.y-vp.dmin.y)*vp.viewport.y/vp.ddiff.y) };
       }
 
+      // transform domain coordinates into viewport coordinates
       function dom( v ){
         return { x:(v.x*vp.ddiff.x/vp.viewport.x)+vp.dmin.x, y:((v.y-vp.viewport.y)*vp.ddiff.y/(-vp.viewport.y))+vp.dmin.y };
       }
-
 
       // fill the selector widget with the constellations
       function fillSelector( cons ) {
@@ -103,19 +123,6 @@
         }
       }
 
-      // sort the constellations array
-      function sortConstellations( cons ){
-        for( var i=0; i<cons.length; i++ )
-          for( var j=i; j<cons.length; j++ ){
-            if( cons[i].name>cons[j].name ){
-                var tmp = cons[i];
-                cons[i] = cons[j];
-                cons[j] = tmp;
-            }
-          }
-        return cons;
-      }
-
       // get constellations from starService and prepare selector
       function getConstellations(){
         var xmlhttp = new XMLHttpRequest();
@@ -126,7 +133,7 @@
             var cons = [];
             for( var i=0; i<conNames.length; i++ )
               cons.push( {name: conNames[i], color: "white", lastColor: "empty"} );
-            constellations = sortConstellations( cons );
+            constellations = cons.sort( (a,b) => { return(a.name > b.name) });
             fillSelector( constellations );
           }
         };
@@ -181,22 +188,19 @@
       function drawStars( stars, color ) {
         var canvas = document.getElementById("starCanvas");
         var ctx = canvas.getContext("2d");
-        // var canvasHalf = canvasWidth/2;
         ctx.fillStyle = color;
         stars.forEach((v) => {
           var vprt = vport( {x:v.x,y:v.y} );
           ctx.beginPath();
-          if( Number(v.mag) < 3 ){
-            if( color == "white" )
-              ctx.arc(vprt.x,vprt.y,3,0,2*Math.PI);
+          var mag = Number(v.mag);
+          var dia = 1;
+          if( mag<=3 ) dia=2.5;
+          if( mag>3 && mag<=4 ) dia=2;
+          if( mag>4 && mag<=6 ) dia=1.5;
+          if( color == "white" )
+              ctx.arc(vprt.x,vprt.y,dia+1,0,2*Math.PI);
             else
-              ctx.arc(vprt.x,vprt.y,2,0,2*Math.PI);
-          }else{
-            if( color == "white" )
-              ctx.arc(vprt.x,vprt.y,2,0,2*Math.PI);
-            else
-              ctx.arc(vprt.x,vprt.y,1,0,2*Math.PI);
-          }
+              ctx.arc(vprt.x,vprt.y,dia,0,2*Math.PI);
           ctx.fill();
         });
       }
@@ -270,6 +274,17 @@
         changeMag( sel.value );
       }
 
+      function showMagValue( v ){
+        var tmp = "Magnitude ("+(v<10?"0":"")+v+") ";
+        document.getElementById("magvalue").innerHTML = tmp;
+      }
+
+      function setMagValue( v ){
+        var tmp = "Magnitude ("+(v<10?"0":"")+v+") ";
+        document.getElementById("magvalue").innerHTML = tmp;
+        changeMag( v );
+      }
+
       function readColor(){
         var color = "yellow";
         if( document.getElementById("red").checked ) color="red";
@@ -305,9 +320,6 @@
       function callbackCanvasDown( xCanvas, yCanvas, alt ) {
         if( !alt ) return;
         zstart = dom( {x:xCanvas, y:yCanvas} );
-        // var canvasHalf = canvasWidth/2;
-        // var x = (xCanvas-canvasHalf)/canvasHalf;
-        // var y = (yCanvas-canvasHalf)/(-canvasHalf);
         document.getElementById("responseSession").innerHTML = "DOWN x="+String(Math.floor(1000*zstart.x)/1000)+" y="+String(Math.floor(1000*zstart.y)/1000);
       }
 
@@ -332,6 +344,7 @@
         document.getElementById("zoomout").disabled = false;
         document.getElementById("zoomout").style.color = "white";
         document.getElementById("zoomout").style.backgroundColor = "darkviolet";
+        document.getElementById("zoomout").innerHTML = "ZOOM OUT ("+(Math.floor(scaleNew*100)/100)+")";
         vp = {};
         vp = {
           viewport: {x:1000,y:1000},
@@ -355,9 +368,9 @@
         drawActiveConstellations();
       }
 
-      // set zoom to half the former value
-      function zoomOut(){
-        if( vpStack.length === 0 )
+      // go back to last zoom values
+      function zoomOut(){;
+        if( vpStack.length == 0 )
           return;
         vp = vpStack.pop();
         if( vpStack.length === 0 ){
@@ -365,6 +378,7 @@
           document.getElementById("zoomout").style.color = "grey";
           document.getElementById("zoomout").style.backgroundColor = "lightgrey";
         }
+        document.getElementById("zoomout").innerHTML = "ZOOM OUT ("+(Math.floor(vp.scale*100)/100)+")";
         var canvas = document.getElementById("starCanvas");
         var ctx = canvas.getContext("2d");
         ctx.fillStyle = 'white';
@@ -372,7 +386,6 @@
         ctx.fill();
 
         drawActiveConstellations();
-        
       }
 
       // clear canvas screen

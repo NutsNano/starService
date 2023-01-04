@@ -1,13 +1,28 @@
 body {
-    background-color: lightblue;
+    background-color: rgb(88, 57, 3);
     color: black;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size:large;
     border-style:inset;
-    border-radius: 6mm;
+    border-radius: 24px;
 }
 
 button {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     border-style:groove;
-    border-radius: 2mm;
+    border-radius: 8px;
+    width:150px;
+}
+
+select {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    border-style:groove;
+    border-radius: 8px;
+    width:150px;
+}
+
+grid-container {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: rgb(3, 88, 40);
+    color: white;
 }
